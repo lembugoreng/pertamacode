@@ -22,7 +22,7 @@ class BlogPostController extends Controller
         ]);
     }
 
-    // ✅ CREATE a new blog post
+    // CREATE a new blog post
     public function store(Request $request)
     {
         $request->validate([
@@ -54,14 +54,14 @@ class BlogPostController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        // ✅ Validate title, content, and big_content
+        // Validate title, content, and big_content
         $request->validate([
             'title' => 'required',
             'content' => 'required',
             'big_content' => 'required',
         ]);
 
-        // ✅ Update the post, including big_content
+        // Update the post, including big_content
         $post->update([
             'title' => $request->title,
             'content' => $request->content,

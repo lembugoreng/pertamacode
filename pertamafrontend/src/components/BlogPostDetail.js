@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom"; // ✅ Import useNavigate
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "../axios";
 import { Typography, Container, Button, Box } from "@mui/material";
 
 const BlogPostDetail = () => {
   const { id } = useParams();
   const [post, setPost] = useState(null);
-  const navigate = useNavigate(); // ✅ Initialize navigate
+  const navigate = useNavigate(); 
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -27,7 +27,7 @@ const BlogPostDetail = () => {
 
   return (
     <Container>
-      {/* ✅ Back Button at the Top-Left */}
+
       <Box sx={{ display: "flex", justifyContent: "flex-start", mb: 2 }}>
         <Button
           variant="outlined"

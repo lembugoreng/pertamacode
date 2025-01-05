@@ -19,7 +19,7 @@ class CommentController extends Controller
         ]);
     }
 
-    // ✅ Add a comment to a specific post
+    // add a comment to a specific post
     public function store(Request $request, $postId)
     {
         $request->validate([

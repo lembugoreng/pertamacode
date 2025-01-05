@@ -64,11 +64,11 @@ const CommentDialog = ({ postId, open, onClose }) => {
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle>Comments</DialogTitle>
       <DialogContent>
-        {loading ? ( // ✅ Show a loading spinner while comments are being fetched
+        {loading ? ( //  show a loading spinner while comments are being fetched
           <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
             <CircularProgress color="primary" />
           </Box>
-        ) : comments.length > 0 ? ( // ✅ Show comments if available
+        ) : comments.length > 0 ? ( // show comments if available
           <List>
             {comments.map((comment) => (
               <ListItem key={comment.id}>
@@ -80,7 +80,7 @@ const CommentDialog = ({ postId, open, onClose }) => {
             ))}
           </List>
         ) : (
-          // ✅ Show this message if there are no comments
+          // show this message if there are no comments
           <Typography variant="body2" color="text.secondary">
             No comments yet.
           </Typography>

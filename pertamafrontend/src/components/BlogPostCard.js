@@ -15,8 +15,8 @@ import {
   DialogActions,
 } from "@mui/material";
 import axios from "../axios";
-import CommentDialog from "./CommentDialog"; // ✅ Import the CommentDialog component
-import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline"; // ✅ Import Comment Icon
+import CommentDialog from "./CommentDialog"; 
+import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline"; 
 
 const BlogPostCard = ({ post, userRole, onPostDeleted, onPostUpdated }) => {
   const [editMode, setEditMode] = useState(false);
@@ -35,7 +35,7 @@ const BlogPostCard = ({ post, userRole, onPostDeleted, onPostUpdated }) => {
     severity: "success",
   });
 
-  // ✅ Fetch the author's name when the component mounts
+  // fetch the authors name when the component mounts
   useEffect(() => {
     const fetchAuthor = async () => {
       try {
@@ -51,7 +51,7 @@ const BlogPostCard = ({ post, userRole, onPostDeleted, onPostUpdated }) => {
     }
   }, [post.user_id]);
 
-  // ✅ Handle post deletion
+  // post deletion
   const handleDelete = () => {
     const token = localStorage.getItem("token");
 
@@ -77,7 +77,7 @@ const BlogPostCard = ({ post, userRole, onPostDeleted, onPostUpdated }) => {
       });
   };
 
-  // ✅ Handle post edit
+  // post edit
   const handleEdit = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -105,7 +105,7 @@ const BlogPostCard = ({ post, userRole, onPostDeleted, onPostUpdated }) => {
     }
   };
 
-  // ✅ Handle closing the snackbar
+
   const handleCloseSnackbar = () => {
     setSnackbar({ ...snackbar, open: false });
   };
@@ -156,7 +156,7 @@ const BlogPostCard = ({ post, userRole, onPostDeleted, onPostUpdated }) => {
         </IconButton>
       </CardActions>
 
-      {/* ✅ Edit Dialog */}
+
       <Dialog open={editMode} onClose={() => setEditMode(false)} fullWidth maxWidth="sm">
         <DialogTitle>Edit Post</DialogTitle>
         <DialogContent>

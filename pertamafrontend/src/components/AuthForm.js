@@ -4,8 +4,8 @@ import { Container, TextField, Button, Typography, Box, Snackbar, Alert, Paper, 
 import { useNavigate, useParams } from 'react-router-dom';
 
 const AuthForm = () => {
-  const { action } = useParams(); // ✅ Get the route parameter
-  const isLogin = action === 'login'; // ✅ Determine if it's login or register
+  const { action } = useParams();
+  const isLogin = action === 'login'; 
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
