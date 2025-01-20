@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\BlogPost;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Subscriber;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 
 class BlogPostController extends Controller
 {
@@ -22,16 +25,16 @@ class BlogPostController extends Controller
         ]);
     }
 
-    // CREATE a new blog post
+
+
     public function store(Request $request)
     {
         $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'big_content' => 'required|string',
-
-
         ]);
+
         $post = BlogPost::create([
             'title' => $request->title,
             'content' => $request->content,
@@ -39,8 +42,27 @@ class BlogPostController extends Controller
             'user_id' => Auth::id(),
         ]);
 
+        // Notify subscribers via email
+        $this->notifySubscribers($post);
+
         return response()->json(['message' => 'Post created successfully!', 'data' => $post]);
     }
+
+    // Function to notify subscribers
+    private function notifySubscribers($post)
+    {
+        $subscribers = Subscriber::all();
+
+        foreach ($subscribers as $subscriber) {
+            Mail::raw("A new blog post titled '{$post->title}' has been published. Check it out now at http://localhost:3000/auth/login ", function ($message) use ($subscriber, $post) {
+                $message->to($subscriber->email)
+                    ->subject('New Blog Post: ' . $post->title);
+            });
+        }
+
+        Log::info("Subscribers notified about new blog post: " . $post->title);
+    }
+
 
     // update blog post admin/editor role
     public function update(Request $request, $id)

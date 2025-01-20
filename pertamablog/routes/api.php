@@ -6,6 +6,7 @@ use App\Http\Controllers\BlogPostController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\AIContentController;
 use Illuminate\Http\Request;
+use App\Http\Controllers\SubscriberController;
 
 // Public Routes
 Route::post('register', [AuthController::class, 'register']);
@@ -45,6 +46,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // Comment Routes
     Route::get('blog-posts/{id}/comments', [CommentController::class, 'index']);
     Route::post('blog-posts/{id}/comments', [CommentController::class, 'store']);
+
+    //subscriber routes
+    Route::post('/subscribe', [SubscriberController::class, 'subscribe']);
 });
 
  //new ai feature

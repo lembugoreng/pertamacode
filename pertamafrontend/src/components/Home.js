@@ -12,6 +12,7 @@ import {
   IconButton,
   Switch,
   Divider,
+  TextField,
 } from "@mui/material";
 import BlogPostCard from "./BlogPostCard";
 import AIContentGenerator from "./AIContentGenerator";
@@ -25,7 +26,8 @@ const Home = () => {
   const [userName, setUserName] = useState("Loading...");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [darkMode, setDarkMode] = useState(false);
+  const [email, setEmail] = useState("");
+  const [subscriptionMessage, setSubscriptionMessage] = useState("");
 
   const navigate = useNavigate();
 
@@ -39,6 +41,17 @@ const Home = () => {
 
     fetchPosts(currentPage);
   }, [currentPage]);
+
+  const handleSubscribe = async () => {
+    try {
+      const response = await axios.post("/subscribe", { email });
+      setSubscriptionMessage(response.data.message);
+    } catch (error) {
+      setSubscriptionMessage(
+        error.response?.data?.message || "Subscription failed."
+      );
+    }
+  };
 
   const fetchUserData = async () => {
     try {
@@ -117,7 +130,9 @@ const Home = () => {
     <Container>
       <Divider sx={{ mb: 4 }} />
       <Stack direction="row" justifyContent="space-between" alignItems="center">
-        <Typography variant="h6">{userName} ({userRole})</Typography>
+        <Typography variant="h6">
+          {userName} ({userRole})
+        </Typography>
         <Stack direction="row" alignItems="center" spacing={2}>
           <Button onClick={handleLogout} variant="contained" color="error">
             Logout
@@ -185,6 +200,23 @@ const Home = () => {
             </Button>
           ))}
         </Box>
+      )}
+
+      <Stack direction="row" spacing={2} sx={{ mb: 4, mt:5}}>
+        <TextField
+          label="Enter your email to receive updates on new blog posts"
+          fullWidth
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <Button variant="contained" color="primary" onClick={handleSubscribe}>
+          Subscribe
+        </Button>
+      </Stack>
+      {subscriptionMessage && (
+        <Alert severity="info" sx={{ mt: 2 }}>
+          {subscriptionMessage}
+        </Alert>
       )}
     </Container>
   );
