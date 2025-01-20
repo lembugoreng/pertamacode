@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BlogPostController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\AIContentController;
 use Illuminate\Http\Request;
 
 // Public Routes
@@ -45,3 +46,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('blog-posts/{id}/comments', [CommentController::class, 'index']);
     Route::post('blog-posts/{id}/comments', [CommentController::class, 'store']);
 });
+
+ //new ai feature
+ Route::middleware('auth:sanctum')->post('ai/generate-content', [AIContentController::class, 'generateContent']);

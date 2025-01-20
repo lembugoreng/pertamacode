@@ -13,10 +13,13 @@ import {
   DialogContent,
   TextField,
   DialogActions,
+  CardMedia,
+  Box,
 } from "@mui/material";
 import axios from "../axios";
-import CommentDialog from "./CommentDialog"; 
-import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline"; 
+import CommentDialog from "./CommentDialog";
+import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 
 const BlogPostCard = ({ post, userRole, onPostDeleted, onPostUpdated }) => {
   const [editMode, setEditMode] = useState(false);
@@ -35,7 +38,6 @@ const BlogPostCard = ({ post, userRole, onPostDeleted, onPostUpdated }) => {
     severity: "success",
   });
 
-  // fetch the authors name when the component mounts
   useEffect(() => {
     const fetchAuthor = async () => {
       try {
@@ -51,7 +53,6 @@ const BlogPostCard = ({ post, userRole, onPostDeleted, onPostUpdated }) => {
     }
   }, [post.user_id]);
 
-  // post deletion
   const handleDelete = () => {
     const token = localStorage.getItem("token");
 
@@ -67,8 +68,7 @@ const BlogPostCard = ({ post, userRole, onPostDeleted, onPostUpdated }) => {
         });
         onPostDeleted(post.id);
       })
-      .catch((error) => {
-        console.error("Failed to delete the post:", error);
+      .catch(() => {
         setSnackbar({
           open: true,
           message: "Failed to delete the post. Please try again.",
@@ -77,7 +77,6 @@ const BlogPostCard = ({ post, userRole, onPostDeleted, onPostUpdated }) => {
       });
   };
 
-  // post edit
   const handleEdit = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -96,7 +95,6 @@ const BlogPostCard = ({ post, userRole, onPostDeleted, onPostUpdated }) => {
       setEditMode(false);
       onPostUpdated(post.id, { title, content, big_content: bigContent });
     } catch (error) {
-      console.error("Failed to update the post:", error);
       setSnackbar({
         open: true,
         message: "Failed to update the post.",
@@ -105,59 +103,97 @@ const BlogPostCard = ({ post, userRole, onPostDeleted, onPostUpdated }) => {
     }
   };
 
-
   const handleCloseSnackbar = () => {
     setSnackbar({ ...snackbar, open: false });
   };
 
   return (
-    <Card sx={{ backgroundColor: "background.paper", mb: 2 }}>
+    <Card
+      sx={{
+        backgroundColor: "background.paper",
+        borderRadius: 2,
+        boxShadow: 3,
+        mb: 3,
+        display: "flex",
+        flexDirection: "column",
+        height: "100%", // Ensure cards take up equal height
+      }}
+    >
+      <CardMedia
+        component="div" // Use "div" to set it as a background image
+        sx={{
+          height: 200, // Ensure height is specified
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundImage: `url(${"https://uscredentialing.com/wp-content/uploads/2014/06/placeholder.png"})`,
+        }}
+        alt={post.title}
+      />
       <CardContent>
-        <Typography variant="h5" color="primary" gutterBottom>
+        <Typography variant="h6" sx={{ fontWeight: "bold" }}>
           {post.title}
         </Typography>
-        <Typography variant="body2" color="text.secondary" noWrap gutterBottom>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
           {post.content.substring(0, 100)}...
         </Typography>
         <Typography variant="caption" color="text.secondary">
           Posted by: {authorName}
         </Typography>
       </CardContent>
-      <CardContent>
+
+      <CardActions
+        sx={{
+          justifyContent: "space-between",
+          alignItems: "center",
+          px: 2,
+          mt: "auto", // Push actions to the bottom
+          mb: 2, // Margin at the bottom
+        }}
+      >
         <Button
           size="small"
+          variant="outlined"
           color="primary"
           onClick={() => (window.location.href = `/posts/${post.id}`)}
         >
           Read More
         </Button>
-      </CardContent>
-
-      <CardActions>
-        {userRole === "admin" && (
-          <>
-            <Button onClick={() => setEditMode(true)} color="secondary">
+        <Box>
+          {userRole === "admin" && (
+            <>
+              <Button
+                onClick={() => setEditMode(true)}
+                color="secondary"
+                size="small"
+              >
+                Edit
+              </Button>
+              <Button onClick={handleDelete} color="error" size="small">
+                Delete
+              </Button>
+            </>
+          )}
+          {userRole === "editor" && (
+            <Button
+              onClick={() => setEditMode(true)}
+              color="secondary"
+              size="small"
+            >
               Edit
             </Button>
-            <Button onClick={handleDelete} color="error">
-              Delete
-            </Button>
-          </>
-        )}
-        {userRole === "editor" && (
-          <>
-            <Button onClick={() => setEditMode(true)} color="secondary">
-              Edit
-            </Button>
-          </>
-        )}
-        <IconButton onClick={() => setCommentsOpen(true)} color="primary">
-          <ChatBubbleOutlineIcon />
-        </IconButton>
+          )}
+          <IconButton onClick={() => setCommentsOpen(true)} color="primary">
+            <ChatBubbleOutlineIcon />
+          </IconButton>
+        </Box>
       </CardActions>
 
-
-      <Dialog open={editMode} onClose={() => setEditMode(false)} fullWidth maxWidth="sm">
+      <Dialog
+        open={editMode}
+        onClose={() => setEditMode(false)}
+        fullWidth
+        maxWidth="sm"
+      >
         <DialogTitle>Edit Post</DialogTitle>
         <DialogContent>
           <TextField
@@ -196,10 +232,22 @@ const BlogPostCard = ({ post, userRole, onPostDeleted, onPostUpdated }) => {
         </DialogActions>
       </Dialog>
 
-      <CommentDialog postId={post.id} open={commentsOpen} onClose={() => setCommentsOpen(false)} />
+      <CommentDialog
+        postId={post.id}
+        open={commentsOpen}
+        onClose={() => setCommentsOpen(false)}
+      />
 
-      <Snackbar open={snackbar.open} autoHideDuration={3000} onClose={handleCloseSnackbar}>
-        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: "100%" }}>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
           {snackbar.message}
         </Alert>
       </Snackbar>

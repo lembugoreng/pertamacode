@@ -1,7 +1,20 @@
 import React, { useEffect, useState } from "react";
 import axios from "../axios";
-import { Container, Typography, Button, CircularProgress, Box, Grid, Alert, Stack } from "@mui/material";
+import {
+  Container,
+  Typography,
+  Button,
+  CircularProgress,
+  Box,
+  Grid,
+  Alert,
+  Stack,
+  IconButton,
+  Switch,
+  Divider,
+} from "@mui/material";
 import BlogPostCard from "./BlogPostCard";
+import AIContentGenerator from "./AIContentGenerator";
 import { useNavigate } from "react-router-dom";
 
 const Home = () => {
@@ -12,10 +25,10 @@ const Home = () => {
   const [userName, setUserName] = useState("Loading...");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [darkMode, setDarkMode] = useState(false);
 
   const navigate = useNavigate();
 
-  // ✅ Fetch user data and posts on component mount
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -27,63 +40,45 @@ const Home = () => {
     fetchPosts(currentPage);
   }, [currentPage]);
 
-  // ✅ Fetch the logged-in user's name and role
   const fetchUserData = async () => {
     try {
       const response = await axios.get("/user");
       setUserName(response.data.name);
       setUserRole(response.data.role);
     } catch (error) {
-      console.error("Error fetching user data:", error);
       setError("Failed to load user data.");
     }
   };
 
-  // ✅ Fetch blog posts
   const fetchPosts = async (page) => {
     setLoading(true);
     try {
       const response = await axios.get(`/blog-posts?page=${page}`);
-      setPosts(response.data.data);
+      const updatedPosts = response.data.data.map((post) => ({
+        ...post,
+        image: post.image || "https://via.placeholder.com/400x200",
+      }));
+      setPosts(updatedPosts);
       setTotalPages(response.data.meta.last_page);
     } catch (error) {
-      console.error("Error fetching blog posts:", error);
       setError("Failed to load blog posts.");
     } finally {
       setLoading(false);
     }
   };
 
-  // ✅ Handle Logout
+  const handlePostUpdated = (postId, updatedPost) => {
+    setPosts((prevPosts) =>
+      prevPosts.map((post) =>
+        post.id === postId ? { ...post, ...updatedPost } : post
+      )
+    );
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("role");
     navigate("/auth/login");
-  };
-
-  // ✅ Handle Post Deletion
-  const handlePostDeleted = async (postId) => {
-    try {
-      // First, filter out the deleted post locally
-      setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
-
-      // Then, re-fetch posts to ensure the grid layout is correct
-      await fetchPosts(currentPage);
-
-      // If the current page becomes empty, go back one page
-      if (posts.length === 1 && currentPage > 1) {
-        setCurrentPage((prevPage) => prevPage - 1);
-      }
-    } catch (error) {
-      console.error("Error handling post deletion:", error);
-    }
-  };
-
-  // ✅ Handle Post Update
-  const handlePostUpdated = (postId, updatedPost) => {
-    setPosts((prevPosts) =>
-      prevPosts.map((post) => (post.id === postId ? { ...post, ...updatedPost } : post))
-    );
   };
 
   if (loading) {
@@ -120,37 +115,58 @@ const Home = () => {
 
   return (
     <Container>
+      <Divider sx={{ mb: 4 }} />
       <Stack direction="row" justifyContent="space-between" alignItems="center">
-        <Typography variant="h4" gutterBottom>
-          Blog Posts
-        </Typography>
-        <Button onClick={handleLogout} variant="contained" color="error">
-          Logout
-        </Button>
+        <Typography variant="h6">{userName} ({userRole})</Typography>
+        <Stack direction="row" alignItems="center" spacing={2}>
+          <Button onClick={handleLogout} variant="contained" color="error">
+            Logout
+          </Button>
+        </Stack>
       </Stack>
 
-      <Typography variant="h6" gutterBottom>
-        Logged in as: {userName} ({userRole})
+      <Typography
+        variant="h2"
+        gutterBottom
+        align="center"
+        sx={{ mt: 4, fontWeight: "bold" }}
+      >
+        THE BLOG
       </Typography>
-
-      {(userRole === "admin" || userRole === "editor") && (
-        <Button
-          onClick={() => navigate("/create")}
-          variant="contained"
-          color="primary"
-          style={{ marginBottom: "20px" }}
-        >
-          Create New Post
-        </Button>
-      )}
-
+      <Divider sx={{ mb: 4 }} />
+      <Stack
+        direction="row"
+        justifyContent="flex-end"
+        alignItems="center"
+        spacing={2}
+        sx={{ mb: 2 }}
+      >
+        <AIContentGenerator onPostCreated={() => fetchPosts(currentPage)} />
+        {(userRole === "admin" || userRole === "editor") && (
+          <Button
+            onClick={() => navigate("/create")}
+            variant="contained"
+            color="primary"
+          >
+            Create New Post
+          </Button>
+        )}
+      </Stack>
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+        sx={{ mb: 2 }}
+      >
+        <Typography variant="h5">Recent blog posts</Typography>
+      </Stack>
       <Grid container spacing={3}>
         {posts.map((post) => (
-          <Grid item xs={12} md={6} key={post.id}>
+          <Grid item xs={12} md={6} lg={4} key={post.id}>
             <BlogPostCard
               post={post}
               userRole={userRole}
-              onPostDeleted={handlePostDeleted}
+              onPostDeleted={() => fetchPosts(currentPage)}
               onPostUpdated={handlePostUpdated}
             />
           </Grid>
@@ -158,7 +174,7 @@ const Home = () => {
       </Grid>
 
       {totalPages > 1 && (
-        <div style={{ textAlign: "center", marginTop: "20px" }}>
+        <Box sx={{ textAlign: "center", marginTop: "20px" }}>
           {Array.from({ length: totalPages }).map((_, index) => (
             <Button
               key={index}
@@ -168,7 +184,7 @@ const Home = () => {
               {index + 1}
             </Button>
           ))}
-        </div>
+        </Box>
       )}
     </Container>
   );
