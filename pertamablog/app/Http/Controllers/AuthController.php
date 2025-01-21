@@ -5,9 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
+
+    
     public function register(Request $request)
     {
         $validated = $request->validate([
@@ -43,4 +47,34 @@ class AuthController extends Controller
 
         return response()->json(['token' => $token, 'user' => $user], 200);
     }
+
+    public function redirectToGitHub()
+    {
+        return Socialite::driver('github')->stateless()->redirect();
+    }
+
+    public function handleGitHubCallback()
+    {
+        try {
+            $githubUser = Socialite::driver('github')->stateless()->user();
+            $user = User::where('email', $githubUser->getEmail())->first();
+
+            if (!$user) {
+                $user = User::create([
+                    'name' => $githubUser->getName(),
+                    'email' => $githubUser->getEmail(),
+                    'password' => bcrypt(str()->random(24)),
+                    'role' => 'reader', // default role for GitHub users
+                ]);
+            }
+
+            $token = $user->createToken('authToken')->plainTextToken;
+
+            return redirect("http://localhost:3000/auth/login?token={$token}");
+        } catch (\Exception $e) {
+            Log::error("GitHub Authentication Failed: " . $e->getMessage());
+            return response()->json(['error' => 'Authentication failed.'], 401);
+        }
+    }
+    
 }

@@ -1,20 +1,32 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from '../axios';
 import { Container, TextField, Button, Typography, Box, Snackbar, Alert, Paper, CircularProgress } from '@mui/material';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { GithubLoginButton } from "react-social-login-buttons";  // Import GitHub button
 
 const AuthForm = () => {
   const { action } = useParams();
-  const isLogin = action === 'login'; 
+  const location = useLocation();
+  const navigate = useNavigate();
+  const isLogin = action === 'login'; // Determines login or register view
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
-  const navigate = useNavigate();
 
-  // Handle Snackbar Close
+  // Capture GitHub token from URL and redirect
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const token = queryParams.get('token');
+
+    if (token) {
+      localStorage.setItem('token', token);
+      navigate('/home');  // Redirect to home page after storing token
+    }
+  }, [location, navigate]);
+
   const handleCloseSnackbar = () => {
     setSnackbar({ ...snackbar, open: false });
   };
@@ -22,20 +34,19 @@ const AuthForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-  
-    //email format validation (regex)
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      setSnackbar({ open: true, message: 'Invalid email format. Please enter a valid email address.', severity: 'error' });
+      setSnackbar({ open: true, message: 'Invalid email format.', severity: 'error' });
       setLoading(false);
       return;
     }
-  
+
     try {
       const endpoint = isLogin ? '/login' : '/register';
       const payload = isLogin ? { email, password } : { name, email, password };
       const response = await axios.post(endpoint, payload);
-  
+
       if (isLogin) {
         localStorage.setItem('token', response.data.token);
         setSnackbar({ open: true, message: 'Login successful!', severity: 'success' });
@@ -45,16 +56,11 @@ const AuthForm = () => {
         navigate('/auth/login');
       }
     } catch (error) {
-      if (error.response && error.response.data.message === 'The email has already been taken.') {
-        setSnackbar({ open: true, message: 'This email is already registered. Please log in.', severity: 'error' });
-      } else {
-        setSnackbar({ open: true, message: 'Registration failed. Please check your details.', severity: 'error' });
-      }
+      setSnackbar({ open: true, message: 'Authentication failed.', severity: 'error' });
     } finally {
       setLoading(false);
     }
   };
-  
 
   return (
     <Container maxWidth="xs" sx={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -67,44 +73,50 @@ const AuthForm = () => {
 
         <form onSubmit={handleSubmit}>
           {!isLogin && (
-            <TextField
-              label="Name"
-              fullWidth
-              margin="normal"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              InputLabelProps={{ style: { color: '#b0bec5' } }}
+            <TextField 
+              label="Name" 
+              fullWidth 
+              margin="normal" 
+              value={name} 
+              onChange={(e) => setName(e.target.value)} 
             />
           )}
-          <TextField
-            label="Email"
-            type="text"
-            fullWidth
-            margin="normal"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            InputLabelProps={{ style: { color: '#b0bec5' } }}
+          <TextField 
+            label="Email" 
+            type="text" 
+            fullWidth 
+            margin="normal" 
+            value={email} 
+            onChange={(e) => setEmail(e.target.value)} 
           />
-          <TextField
-            label="Password"
-            type="password"
-            fullWidth
-            margin="normal"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            InputLabelProps={{ style: { color: '#b0bec5' } }}
+          <TextField 
+            label="Password" 
+            type="password" 
+            fullWidth 
+            margin="normal" 
+            value={password} 
+            onChange={(e) => setPassword(e.target.value)} 
           />
 
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            fullWidth
-            sx={{ mt: 2 }}
+          <Button 
+            type="submit" 
+            variant="contained" 
+            color="primary" 
+            fullWidth 
+            sx={{ mt: 2 }} 
             disabled={loading}
           >
             {loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : isLogin ? 'Login' : 'Register'}
           </Button>
+
+          {/* GitHub Login Button */}
+          <Box sx={{ mt: 2 }}>
+            <GithubLoginButton 
+              onClick={() => window.location.href = 'http://localhost:8000/api/auth/github/redirect'}
+            >
+              Login with GitHub
+            </GithubLoginButton>
+          </Box>
         </form>
 
         <Button onClick={() => navigate(isLogin ? '/auth/register' : '/auth/login')} sx={{ mt: 2, color: 'secondary.main' }}>

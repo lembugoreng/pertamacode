@@ -12,6 +12,7 @@ import {
   Box,
   CircularProgress, 
   Typography,
+  Chip,
 } from "@mui/material";
 import axios from "../axios";
 
@@ -20,15 +21,13 @@ const CommentDialog = ({ postId, open, onClose }) => {
   const [newComment, setNewComment] = useState("");
   const [loading, setLoading] = useState(true); 
 
- 
   useEffect(() => {
     if (open) {
       fetchComments();
     }
   }, [open]);
 
-
-  // get comments
+  // Fetch comments with sentiment analysis
   const fetchComments = async () => {
     setLoading(true); 
     try {
@@ -41,7 +40,7 @@ const CommentDialog = ({ postId, open, onClose }) => {
     }
   };
 
-  //add new comment
+  // Add new comment
   const handleAddComment = async () => {
     if (!newComment.trim()) return;
 
@@ -54,9 +53,22 @@ const CommentDialog = ({ postId, open, onClose }) => {
       );
 
       setNewComment("");
-      fetchComments(); //  refetch comments to get the correct user data
+      fetchComments(); // Refetch comments to get the correct user data with sentiment
     } catch (error) {
       console.error("Error adding comment:", error);
+    }
+  };
+
+  // Function to determine the sentiment label color
+  const getSentimentColor = (sentiment) => {
+    switch (sentiment) {
+      case "positive":
+        return "success";
+      case "negative":
+        return "error";
+      case "neutral":
+      default:
+        return "warning";
     }
   };
 
@@ -64,23 +76,27 @@ const CommentDialog = ({ postId, open, onClose }) => {
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle>Comments</DialogTitle>
       <DialogContent>
-        {loading ? ( //  show a loading spinner while comments are being fetched
+        {loading ? ( 
           <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
             <CircularProgress color="primary" />
           </Box>
-        ) : comments.length > 0 ? ( // show comments if available
+        ) : comments.length > 0 ? ( 
           <List>
             {comments.map((comment) => (
-              <ListItem key={comment.id}>
+              <ListItem key={comment.id} alignItems="flex-start">
                 <ListItemText
                   primary={comment.user ? comment.user.name : "Unknown User"}
                   secondary={comment.comment_text}
+                />
+                <Chip 
+                  label={comment.sentiment || "No Sentiment"} 
+                  color={getSentimentColor(comment.sentiment)}
+                  sx={{ ml: 2 }}
                 />
               </ListItem>
             ))}
           </List>
         ) : (
-          // show this message if there are no comments
           <Typography variant="body2" color="text.secondary">
             No comments yet.
           </Typography>

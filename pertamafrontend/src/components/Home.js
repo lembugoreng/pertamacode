@@ -188,6 +188,7 @@ const Home = () => {
         ))}
       </Grid>
 
+      <Stack direction="row" justifyContent="center" spacing={3} sx={{ mb: 4, mt:5}}>
       {totalPages > 1 && (
         <Box sx={{ textAlign: "center", marginTop: "20px" }}>
           {Array.from({ length: totalPages }).map((_, index) => (
@@ -201,6 +202,7 @@ const Home = () => {
           ))}
         </Box>
       )}
+      </Stack>
 
       <Stack direction="row" spacing={2} sx={{ mb: 4, mt:5}}>
         <TextField

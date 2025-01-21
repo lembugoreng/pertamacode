@@ -19,8 +19,15 @@ const App = () => {
     palette: {
       mode: themeMode,
       ...(themeMode === 'light'
-        ? { background: { default: '#ffffff' }, text: { primary: '#000' } }
-        : { background: { default: '#121212' }, text: { primary: '#fff' } }),
+        ? { 
+            background: { default: '#f5f5f5' }, // Softer white
+            text: { primary: '#333' }  // Dark gray text for readability
+          }
+        : { 
+            background: { default: '#121212' }, 
+            text: { primary: '#fff' } 
+          }
+      ),
     },
   });
 

@@ -7,6 +7,17 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\AIContentController;
 use Illuminate\Http\Request;
 use App\Http\Controllers\SubscriberController;
+use App\Http\Controllers\SocialAuthController;
+use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+
+
+
+// GitHub OAuth
+Route::get('auth/github/redirect', [SocialAuthController::class, 'redirectToGitHub']);
+Route::get('auth/github/callback', [SocialAuthController::class, 'handleGitHubCallback']);
+
 
 // Public Routes
 Route::post('register', [AuthController::class, 'register']);

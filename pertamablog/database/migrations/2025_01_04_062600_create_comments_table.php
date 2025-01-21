@@ -16,10 +16,10 @@ return new class extends Migration
             $table->foreignId('post_id')->constrained('blog_posts')->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->text('comment_text');
+            $table->string('sentiment')->nullable(); // Adding sentiment analysis column
             $table->timestamps();
         });
     }
-
 
     /**
      * Reverse the migrations.

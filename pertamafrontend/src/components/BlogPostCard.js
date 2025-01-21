@@ -15,6 +15,7 @@ import {
   DialogActions,
   CardMedia,
   Box,
+  Badge,
 } from "@mui/material";
 import axios from "../axios";
 import CommentDialog from "./CommentDialog";
@@ -30,6 +31,7 @@ const BlogPostCard = ({ post, userRole, onPostDeleted, onPostUpdated }) => {
   const [title, setTitle] = useState(post.title);
   const [content, setContent] = useState(post.content);
   const [bigContent, setBigContent] = useState(post.big_content);
+  const [commentCount, setCommentCount] = useState(0);
 
   // Snackbar state
   const [snackbar, setSnackbar] = useState({
@@ -48,10 +50,21 @@ const BlogPostCard = ({ post, userRole, onPostDeleted, onPostUpdated }) => {
       }
     };
 
+    const fetchCommentCount = async () => {
+      try {
+        const response = await axios.get(`/blog-posts/${post.id}/comments`);
+        setCommentCount(response?.data?.data?.length || "0"); //fallback to 0 if no comments
+        
+      } catch (error) {
+        console.error("Failed to fetch comment count:", error);
+      }
+    };
+
     if (post.user_id) {
       fetchAuthor();
     }
-  }, [post.user_id]);
+    fetchCommentCount();
+  }, [post.user_id, post.id]);
 
   const handleDelete = () => {
     const token = localStorage.getItem("token");
@@ -183,7 +196,9 @@ const BlogPostCard = ({ post, userRole, onPostDeleted, onPostUpdated }) => {
             </Button>
           )}
           <IconButton onClick={() => setCommentsOpen(true)} color="primary">
-            <ChatBubbleOutlineIcon />
+            <Badge badgeContent={commentCount} color="secondary">
+              <ChatBubbleOutlineIcon />
+            </Badge>
           </IconButton>
         </Box>
       </CardActions>
