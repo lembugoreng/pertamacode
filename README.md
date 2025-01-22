@@ -34,8 +34,8 @@ Before running the project, ensure you have the following installed:
 5. **Light/Dark Mode Toggle:**  
    - Users can switch between light and dark themes across the application.
 
-6. **Pagination for Blog Posts:**  
-   - Optimized pagination to fetch blog posts efficiently.
+6. **UI Changes**  
+   - Fixed the overall look and feel of the UI to be more user friendly and give better clarity.
 
 7. **Comment Count Display:**  
    - Shows the number of comments per post dynamically.
