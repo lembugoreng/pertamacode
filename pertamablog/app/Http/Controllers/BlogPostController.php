@@ -13,7 +13,9 @@ class BlogPostController extends Controller
 {
     public function index()
     {
-        $posts = BlogPost::with('user:id,name')->paginate(6);
+        $posts = BlogPost::with('user:id,name')
+            ->orderBy('created_at', 'desc') // Sort by creation date in descending order
+            ->paginate(6);
 
         return response()->json([
             'data' => $posts->items(),
@@ -24,6 +26,7 @@ class BlogPostController extends Controller
             ],
         ]);
     }
+
 
 
 

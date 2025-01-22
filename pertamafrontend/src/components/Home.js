@@ -156,15 +156,17 @@ const Home = () => {
         spacing={2}
         sx={{ mb: 2 }}
       >
-        <AIContentGenerator onPostCreated={() => fetchPosts(currentPage)} />
         {(userRole === "admin" || userRole === "editor") && (
-          <Button
-            onClick={() => navigate("/create")}
-            variant="contained"
-            color="primary"
-          >
-            Create New Post
-          </Button>
+          <Stack direction="row" spacing={2}>
+            <AIContentGenerator onPostCreated={() => fetchPosts(currentPage)} />
+            <Button
+              onClick={() => navigate("/create")}
+              variant="contained"
+              color="primary"
+            >
+              Create New Post
+            </Button>
+          </Stack>
         )}
       </Stack>
       <Stack
@@ -188,23 +190,27 @@ const Home = () => {
         ))}
       </Grid>
 
-      <Stack direction="row" justifyContent="center" spacing={3} sx={{ mb: 4, mt:5}}>
-      {totalPages > 1 && (
-        <Box sx={{ textAlign: "center", marginTop: "20px" }}>
-          {Array.from({ length: totalPages }).map((_, index) => (
-            <Button
-              key={index}
-              variant={index + 1 === currentPage ? "contained" : "outlined"}
-              onClick={() => setCurrentPage(index + 1)}
-            >
-              {index + 1}
-            </Button>
-          ))}
-        </Box>
-      )}
+      <Stack direction="row" justifyContent="center" sx={{ mb: 4, mt: 5 }}>
+        {totalPages > 1 && (
+          <Stack
+            direction="row"
+            spacing={1}
+            sx={{ textAlign: "center", mt: 2 }}
+          >
+            {Array.from({ length: totalPages }).map((_, index) => (
+              <Button
+                key={index}
+                variant={index + 1 === currentPage ? "contained" : "outlined"}
+                onClick={() => setCurrentPage(index + 1)}
+              >
+                {index + 1}
+              </Button>
+            ))}
+          </Stack>
+        )}
       </Stack>
 
-      <Stack direction="row" spacing={2} sx={{ mb: 4, mt:5}}>
+      <Stack direction="row" spacing={2} sx={{ mb: 4, mt: 5 }}>
         <TextField
           label="Enter your email to receive updates on new blog posts"
           fullWidth
