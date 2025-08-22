@@ -1,21 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "../axios";
-import {
-  Typography,
-  Container,
-  Button,
-  Box,
-  Paper,
-  Avatar,
-  Divider,
-  Card,
-  CardContent,
-  CardMedia,
-  Chip,
-  CircularProgress,
-} from "@mui/material";
-import { Facebook, Twitter, LinkedIn } from "@mui/icons-material";
 
 const BlogPostDetail = () => {
   const { id } = useParams();
@@ -36,94 +21,76 @@ const BlogPostDetail = () => {
 
   if (!post) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 5 }}>
-        <CircularProgress color="primary" />
-      </Box>
+      <div className="flex justify-center py-10">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-black/20 border-t-black dark:border-white/20 dark:border-t-white" />
+      </div>
     );
   }
 
   return (
-    <Container maxWidth="md">
-      <Box sx={{ display: "flex", justifyContent: "flex-start", mb: 2 }}>
-        <Button variant="outlined" color="primary" onClick={() => navigate("/home")}>
-          Back to Home
-        </Button>
-      </Box>
+    <div className="mx-auto max-w-3xl p-4">
+      <button className="mb-4 rounded-md border border-black/20 px-3 py-1.5 text-sm hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/5" onClick={() => navigate("/home")}>
+        Back to Home
+      </button>
 
-      {/* Blog Banner */}
-
-
-      <Paper elevation={3} sx={{ padding: 4, borderRadius: 3, backgroundColor: "background.paper" }}>
-        <Typography variant="h3" sx={{ fontWeight: "bold", color: "primary.main" }}>
-          {post.title}
-        </Typography>
-
-        <Typography variant="subtitle1" color="text.secondary" sx={{ mt: 1, mb: 2 }}>
+      <div className="rounded-xl border border-black/10 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-zinc-900">
+        <h1 className="text-3xl font-bold">{post.title}</h1>
+        <div className="mt-2 text-sm text-black/60 dark:text-white/60">
           Posted by: {post.authorName} | {new Date(post.created_at).toDateString()}
-        </Typography>
+        </div>
 
-        <Divider sx={{ mb: 3 }} />
+        <div className="my-6 h-px bg-black/10 dark:bg-white/10" />
 
-        <Typography variant="body1" sx={{ lineHeight: 1.8 }}>
-          {post.big_content}
-        </Typography>
+        <div className="prose max-w-none dark:prose-invert">
+          <p className="leading-7">{post.big_content}</p>
+        </div>
 
-        <Divider sx={{ my: 3 }} />
+        <div className="my-6 h-px bg-black/10 dark:bg-white/10" />
 
-        {/* Tags */}
-        <Box sx={{ display: "flex", gap: 1, mb: 3 }}>
-          <Chip label="Technology" color="primary" />
-          <Chip label="Innovation" color="secondary" />
-          <Chip label="Development" color="success" />
-        </Box>
+        <div className="flex flex-wrap items-center gap-2">
+          {['Technology','Innovation','Development'].map((t) => (
+            <span key={t} className="rounded-md border border-black/20 px-2 py-1 text-xs dark:border-white/20">{t}</span>
+          ))}
+        </div>
 
-        {/* Social Share Buttons */}
-        <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 2 }}>
-          <Button
-            startIcon={<Facebook />}
-            variant="contained"
-            color="primary"
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+          <a
+            className="rounded-md bg-black px-3 py-1.5 text-sm text-white hover:bg-black/80 dark:bg-white dark:text-black dark:hover:bg-white/90"
             href={`https://www.facebook.com/sharer/sharer.php?u=${window.location.href}`}
             target="_blank"
+            rel="noreferrer"
           >
             Share
-          </Button>
-          <Button
-            startIcon={<Twitter />}
-            variant="contained"
-            color="info"
+          </a>
+          <a
+            className="rounded-md border border-black/20 px-3 py-1.5 text-sm hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/5"
             href={`https://twitter.com/intent/tweet?url=${window.location.href}`}
             target="_blank"
+            rel="noreferrer"
           >
             Tweet
-          </Button>
-          <Button
-            startIcon={<LinkedIn />}
-            variant="contained"
-            color="secondary"
+          </a>
+          <a
+            className="rounded-md border border-black/20 px-3 py-1.5 text-sm hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/5"
             href={`https://www.linkedin.com/sharing/share-offsite/?url=${window.location.href}`}
             target="_blank"
+            rel="noreferrer"
           >
             Share
-          </Button>
-        </Box>
-      </Paper>
+          </a>
+        </div>
+      </div>
 
-      {/* Author Bio */}
-      <Box sx={{ mt: 5, textAlign: "center" }}>
-        <Avatar
+      <div className="mt-8 text-center">
+        <img
           alt={post.authorName}
           src="https://i.pravatar.cc/150?img=8"
-          sx={{ width: 80, height: 80, margin: "0 auto" }}
+          className="mx-auto h-20 w-20 rounded-full"
         />
-        <Typography variant="h6" sx={{ mt: 2, fontWeight: "bold" }}>
-          {post.authorName}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Passionate writer in technology and innovation.
-        </Typography>
-      </Box>
-    </Container>
+        <div className="mt-2 text-lg font-semibold">{post.authorName}</div>
+        <div className="text-sm text-black/60 dark:text-white/60">Passionate writer in technology and innovation.</div>
+      </div>
+    </div>
   );
 };
 

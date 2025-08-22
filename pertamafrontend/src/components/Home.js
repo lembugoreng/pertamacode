@@ -1,19 +1,5 @@
 import React, { useEffect, useState } from "react";
 import axios from "../axios";
-import {
-  Container,
-  Typography,
-  Button,
-  CircularProgress,
-  Box,
-  Grid,
-  Alert,
-  Stack,
-  IconButton,
-  Switch,
-  Divider,
-  TextField,
-} from "@mui/material";
 import BlogPostCard from "./BlogPostCard";
 import AIContentGenerator from "./AIContentGenerator";
 import { useNavigate } from "react-router-dom";
@@ -34,7 +20,7 @@ const Home = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
-      window.location.href = "/login";
+      window.location.href = "/auth/login";
     } else {
       fetchUserData();
     }
@@ -69,7 +55,7 @@ const Home = () => {
       const response = await axios.get(`/blog-posts?page=${page}`);
       const updatedPosts = response.data.data.map((post) => ({
         ...post,
-        image: post.image || "https://via.placeholder.com/400x200",
+        image: post.image || "https://via.placeholder.com/800x400?text=Post",
       }));
       setPosts(updatedPosts);
       setTotalPages(response.data.meta.last_page);
@@ -96,137 +82,90 @@ const Home = () => {
 
   if (loading) {
     return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-          backgroundColor: "background.default",
-        }}
-      >
-        <CircularProgress color="primary" />
-      </Box>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="h-10 w-10 animate-spin rounded-full border-2 border-black/20 border-t-black dark:border-white/20 dark:border-t-white" />
+      </div>
     );
   }
 
   if (error) {
     return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-          backgroundColor: "background.default",
-        }}
-      >
-        <Alert severity="error">{error}</Alert>
-      </Box>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="rounded-md bg-red-500/10 px-4 py-2 text-red-600 dark:text-red-400">{error}</div>
+      </div>
     );
   }
 
   return (
-    <Container>
-      <Divider sx={{ mb: 4 }} />
-      <Stack direction="row" justifyContent="space-between" alignItems="center">
-        <Typography variant="h6">
-          {userName} ({userRole})
-        </Typography>
-        <Stack direction="row" alignItems="center" spacing={2}>
-          <Button onClick={handleLogout} variant="contained" color="error">
-            Logout
-          </Button>
-        </Stack>
-      </Stack>
+    <div className="mx-auto max-w-6xl p-4 md:p-6">
+      <div className="mb-6 flex items-center justify-between">
+        <div className="text-sm text-black/70 dark:text-white/70">{userName} ({userRole})</div>
+        <div className="flex items-center gap-3">
+          <button onClick={handleLogout} className="rounded-md bg-black px-3 py-2 text-sm text-white hover:bg-black/80 dark:bg-white dark:text-black dark:hover:bg-white/90">Logout</button>
+        </div>
+      </div>
 
-      <Typography
-        variant="h2"
-        gutterBottom
-        align="center"
-        sx={{ mt: 4, fontWeight: "bold" }}
-      >
-        THE BLOG
-      </Typography>
-      <Divider sx={{ mb: 4 }} />
-      <Stack
-        direction="row"
-        justifyContent="flex-end"
-        alignItems="center"
-        spacing={2}
-        sx={{ mb: 2 }}
-      >
-        {(userRole === "admin" || userRole === "editor") && (
-          <Stack direction="row" spacing={2}>
-            <AIContentGenerator onPostCreated={() => fetchPosts(currentPage)} />
-            <Button
-              onClick={() => navigate("/create")}
-              variant="contained"
-              color="primary"
-            >
-              Create New Post
-            </Button>
-          </Stack>
-        )}
-      </Stack>
-      <Stack
-        direction="row"
-        justifyContent="space-between"
-        alignItems="center"
-        sx={{ mb: 2 }}
-      >
-        <Typography variant="h5">Recent blog posts</Typography>
-      </Stack>
-      <Grid container spacing={3}>
-        {posts.map((post) => (
-          <Grid item xs={12} md={6} lg={4} key={post.id}>
-            <BlogPostCard
-              post={post}
-              userRole={userRole}
-              onPostDeleted={() => fetchPosts(currentPage)}
-              onPostUpdated={handlePostUpdated}
-            />
-          </Grid>
-        ))}
-      </Grid>
+      <h1 className="mb-4 text-center text-4xl font-extrabold tracking-tight">THE BLOG</h1>
 
-      <Stack direction="row" justifyContent="center" sx={{ mb: 4, mt: 5 }}>
-        {totalPages > 1 && (
-          <Stack
-            direction="row"
-            spacing={1}
-            sx={{ textAlign: "center", mt: 2 }}
+      {(userRole === "admin" || userRole === "editor") && (
+        <div className="mb-6 flex flex-wrap items-center justify-end gap-3">
+          <AIContentGenerator onPostCreated={() => fetchPosts(currentPage)} />
+          <button
+            onClick={() => navigate("/create")}
+            className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-black/80 dark:bg-white dark:text-black dark:hover:bg-white/90"
           >
+            Create New Post
+          </button>
+        </div>
+      )}
+
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-xl font-semibold">Recent blog posts</h2>
+      </div>
+
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+        {posts.map((post) => (
+          <BlogPostCard
+            key={post.id}
+            post={post}
+            userRole={userRole}
+            onPostDeleted={() => fetchPosts(currentPage)}
+            onPostUpdated={handlePostUpdated}
+          />
+        ))}
+      </div>
+
+      {totalPages > 1 && (
+        <div className="mt-8 flex justify-center">
+          <div className="flex gap-2">
             {Array.from({ length: totalPages }).map((_, index) => (
-              <Button
+              <button
                 key={index}
-                variant={index + 1 === currentPage ? "contained" : "outlined"}
                 onClick={() => setCurrentPage(index + 1)}
+                className={`${index + 1 === currentPage ? 'bg-black text-white dark:bg-white dark:text-black' : 'bg-transparent text-black dark:text-white border border-black/20 dark:border-white/20'} rounded-md px-3 py-1 text-sm`}
               >
                 {index + 1}
-              </Button>
+              </button>
             ))}
-          </Stack>
-        )}
-      </Stack>
+          </div>
+        </div>
+      )}
 
-      <Stack direction="row" spacing={2} sx={{ mb: 4, mt: 5 }}>
-        <TextField
-          label="Enter your email to receive updates on new blog posts"
-          fullWidth
+      <div className="mt-10 flex flex-col items-stretch gap-3 sm:flex-row">
+        <input
+          type="email"
+          placeholder="Enter your email to receive updates on new blog posts"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          className="w-full rounded-md border border-black/10 bg-white px-3 py-2 text-sm outline-none placeholder:text-black/40 focus:border-black dark:border-white/10 dark:bg-black dark:placeholder:text-white/40"
         />
-        <Button variant="contained" color="primary" onClick={handleSubscribe}>
-          Subscribe
-        </Button>
-      </Stack>
+        <button onClick={handleSubscribe} className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-black/80 dark:bg-white dark:text-black dark:hover:bg-white/90">Subscribe</button>
+      </div>
+
       {subscriptionMessage && (
-        <Alert severity="info" sx={{ mt: 2 }}>
-          {subscriptionMessage}
-        </Alert>
+        <div className="mt-3 rounded-md bg-blue-500/10 px-3 py-2 text-sm text-blue-700 dark:text-blue-400">{subscriptionMessage}</div>
       )}
-    </Container>
+    </div>
   );
 };
 

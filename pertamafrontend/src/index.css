@@ -3,9 +3,9 @@
 @tailwind utilities;
 
 html, body, #root {
-	height: 100%;
+  height: 100%;
 }
 
 body {
-	@apply bg-white text-black dark:bg-black dark:text-white antialiased;
+  @apply bg-white text-black dark:bg-black dark:text-white antialiased;
 }

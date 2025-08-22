@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, CircularProgress, Snackbar, Alert, Dialog, DialogTitle, DialogContent, TextField, DialogActions } from "@mui/material";
+import Modal from "./Modal";
 import axios from "../axios";
 
 const AIContentGenerator = ({ onPostCreated }) => {
@@ -21,16 +21,14 @@ const AIContentGenerator = ({ onPostCreated }) => {
     setLoading(true);
     try {
       const response = await axios.post("/ai/generate-content", { topic });
-
       if (response.data) {
         await axios.post("/blog-posts", {
           title: response.data.title,
           content: response.data.content,
           big_content: response.data.big_content,
           status: "published",
-          user_id: 1, // Update this to use dynamic user data
+          user_id: 1,
         });
-
         setSnackbar({ open: true, message: "Post created successfully!", severity: "success" });
         onPostCreated();
       }
@@ -44,36 +42,34 @@ const AIContentGenerator = ({ onPostCreated }) => {
 
   return (
     <>
-      <Button variant="contained" color="primary" onClick={() => setOpen(true)} disabled={loading}>
-        {loading ? <CircularProgress size={24} color="inherit" /> : "Generate AI Content"}
-      </Button>
+      <button
+        className="rounded-md border border-black/20 px-4 py-2 text-sm hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/5"
+        onClick={() => setOpen(true)}
+        disabled={loading}
+      >
+        {loading ? 'Generating…' : 'Generate AI Content'}
+      </button>
 
-      <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="sm">
-        <DialogTitle>Generate Blog Post with AI</DialogTitle>
-        <DialogContent>
-          <TextField
-            label="Enter topic"
-            fullWidth
-            margin="normal"
-            value={topic}
-            onChange={(e) => setTopic(e.target.value)}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpen(false)} color="secondary">
-            Cancel
-          </Button>
-          <Button onClick={handleGenerateContent} variant="contained" color="primary">
-            Generate
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <Modal open={open} onClose={() => setOpen(false)} title="Generate Blog Post with AI" actions={(
+        <>
+          <button onClick={() => setOpen(false)} className="rounded-md px-3 py-2 text-sm hover:bg-black/5 dark:hover:bg-white/5">Cancel</button>
+          <button onClick={handleGenerateContent} className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-black/80 dark:bg-white dark:text-black dark:hover:bg-white/90">Generate</button>
+        </>
+      )}>
+        <label className="mb-1 block text-sm">Enter topic</label>
+        <input
+          type="text"
+          value={topic}
+          onChange={(e) => setTopic(e.target.value)}
+          className="w-full rounded-md border border-black/10 bg-white px-3 py-2 text-sm outline-none focus:border-black dark:border-white/10 dark:bg-black"
+        />
+      </Modal>
 
-      <Snackbar open={snackbar.open} autoHideDuration={3000} onClose={handleCloseSnackbar}>
-        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: "100%" }}>
+      {snackbar.open && (
+        <div className={`mt-2 rounded-md px-3 py-2 text-sm ${snackbar.severity === 'error' ? 'bg-red-500/10 text-red-600 dark:text-red-400' : 'bg-green-500/10 text-green-600 dark:text-green-400'}`} onAnimationEnd={handleCloseSnackbar}>
           {snackbar.message}
-        </Alert>
-      </Snackbar>
+        </div>
+      )}
     </>
   );
 };
