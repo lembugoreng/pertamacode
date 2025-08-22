@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import axios from '../axios';
-import { Container, TextField, Button, Typography, Box, Snackbar, Alert, Paper, CircularProgress } from '@mui/material';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { GithubLoginButton } from "react-social-login-buttons";  // Import GitHub button
 
 const AuthForm = () => {
   const { action } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const isLogin = action === 'login'; // Determines login or register view
+  const isLogin = action === 'login';
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -16,14 +14,12 @@ const AuthForm = () => {
   const [loading, setLoading] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
-  // Capture GitHub token from URL and redirect
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const token = queryParams.get('token');
-
     if (token) {
       localStorage.setItem('token', token);
-      navigate('/home');  // Redirect to home page after storing token
+      navigate('/home');
     }
   }, [location, navigate]);
 
@@ -63,73 +59,84 @@ const AuthForm = () => {
   };
 
   return (
-    <Container maxWidth="xs" sx={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <Paper elevation={4} sx={{ padding: 4, backgroundColor: 'background.paper' }}>
-        <Box textAlign="center">
-          <Typography variant="h4" gutterBottom color="primary">
-            {isLogin ? 'Login' : 'Register'}
-          </Typography>
-        </Box>
+    <div className="min-h-screen flex items-center justify-center bg-white text-black dark:bg-black dark:text-white px-4">
+      <div className="w-full max-w-md border border-black/10 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-zinc-900 rounded-xl">
+        <div className="text-center mb-6">
+          <h1 className="text-2xl font-semibold">{isLogin ? 'Login' : 'Register'}</h1>
+          <p className="mt-1 text-sm text-black/60 dark:text-white/60">Minimalist blog access</p>
+        </div>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="space-y-4">
           {!isLogin && (
-            <TextField 
-              label="Name" 
-              fullWidth 
-              margin="normal" 
-              value={name} 
-              onChange={(e) => setName(e.target.value)} 
-            />
+            <div>
+              <label className="block text-sm mb-1">Name</label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full rounded-md border border-black/10 bg-white px-3 py-2 text-sm outline-none ring-0 placeholder:text-black/40 focus:border-black dark:border-white/10 dark:bg-black dark:placeholder:text-white/40"
+                placeholder="Your name"
+              />
+            </div>
           )}
-          <TextField 
-            label="Email" 
-            type="text" 
-            fullWidth 
-            margin="normal" 
-            value={email} 
-            onChange={(e) => setEmail(e.target.value)} 
-          />
-          <TextField 
-            label="Password" 
-            type="password" 
-            fullWidth 
-            margin="normal" 
-            value={password} 
-            onChange={(e) => setPassword(e.target.value)} 
-          />
 
-          <Button 
-            type="submit" 
-            variant="contained" 
-            color="primary" 
-            fullWidth 
-            sx={{ mt: 2 }} 
+          <div>
+            <label className="block text-sm mb-1">Email</label>
+            <input
+              type="text"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full rounded-md border border-black/10 bg-white px-3 py-2 text-sm outline-none ring-0 placeholder:text-black/40 focus:border-black dark:border-white/10 dark:bg-black dark:placeholder:text-white/40"
+              placeholder="you@example.com"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm mb-1">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full rounded-md border border-black/10 bg-white px-3 py-2 text-sm outline-none ring-0 placeholder:text-black/40 focus:border-black dark:border-white/10 dark:bg-black dark:placeholder:text-white/40"
+              placeholder="••••••••"
+            />
+          </div>
+
+          <button
+            type="submit"
             disabled={loading}
+            className="w-full inline-flex items-center justify-center rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-black/80 disabled:opacity-60 dark:bg-white dark:text-black dark:hover:bg-white/90"
           >
-            {loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : isLogin ? 'Login' : 'Register'}
-          </Button>
+            {loading ? 'Please wait…' : isLogin ? 'Login' : 'Register'}
+          </button>
 
-          {/* GitHub Login Button */}
-          <Box sx={{ mt: 2 }}>
-            <GithubLoginButton 
-              onClick={() => window.location.href = 'http://localhost:8000/api/auth/github/redirect'}
-            >
-              Login with GitHub
-            </GithubLoginButton>
-          </Box>
+          <button
+            type="button"
+            onClick={() => window.location.href = 'http://localhost:8000/api/auth/github/redirect'}
+            className="w-full rounded-md border border-black/10 bg-white px-4 py-2 text-sm font-medium text-black hover:bg-black/5 dark:border-white/10 dark:bg-black dark:text-white dark:hover:bg-white/5"
+          >
+            Continue with GitHub
+          </button>
         </form>
 
-        <Button onClick={() => navigate(isLogin ? '/auth/register' : '/auth/login')} sx={{ mt: 2, color: 'secondary.main' }}>
+        <button
+          onClick={() => navigate(isLogin ? '/auth/register' : '/auth/login')}
+          className="mt-4 w-full text-center text-sm text-black/70 hover:underline dark:text-white/70"
+        >
           {isLogin ? "Don't have an account? Register" : 'Already have an account? Login'}
-        </Button>
-      </Paper>
+        </button>
 
-      <Snackbar open={snackbar.open} autoHideDuration={3000} onClose={handleCloseSnackbar}>
-        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
-    </Container>
+        {snackbar.open && (
+          <div
+            className={`mt-4 w-full rounded-md px-3 py-2 text-sm ${snackbar.severity === 'error' ? 'bg-red-500/10 text-red-600 dark:text-red-400' : 'bg-green-500/10 text-green-600 dark:text-green-400'}`}
+            role="alert"
+            onAnimationEnd={handleCloseSnackbar}
+          >
+            {snackbar.message}
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 
